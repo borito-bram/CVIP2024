@@ -1,0 +1,85 @@
+import keyboard
+game_GUI_x = 735
+game_GUI_y = 300
+game_GUI_w = 445
+game_GUI_h = 525
+
+# Wait for the key 's' to be pressed
+keyboard.wait('s')
+
+# Take a screenshot of the game GUI
+screenshot = pyautogui.screenshot(region=(game_GUI_x, game_GUI_y, game_GUI_w, game_GUI_h))
+
+# Convert the screenshot to an OpenCV image
+image = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+image_gray = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2GRAY)
+
+# Create subplots
+fig, axs = plt.subplots(1, 2)
+
+# Display the game GUI color image
+axs[0].imshow(image)
+axs[0].set_title('game_GUI')
+
+# Display the game GUI grayscale image
+axs[1].imshow(image_gray, cmap='gray')
+axs[1].set_title('game_GUI_gray')
+
+# Show the plot
+plt.show()
+
+
+# Load the templates
+template_L = cv2.imread("Kick_ya_chop/Left_branch.png")
+image_L = cv2.cvtColor(np.array(template_L), cv2.COLOR_RGB2BGR)
+image_L_gray = cv2.cvtColor(np.array(template_L), cv2.COLOR_RGB2GRAY)
+
+template_R = cv2.imread("Kick_ya_chop/Right_branch.png")
+image_R = cv2.cvtColor(np.array(template_R), cv2.COLOR_RGB2BGR)
+image_R_gray = cv2.cvtColor(np.array(template_R), cv2.COLOR_RGB2GRAY)
+
+# Create subplots
+fig, axs = plt.subplots(2, 2)
+
+# Display the left color image
+axs[0, 0].imshow(image_L)
+axs[0, 0].set_title('image_L')
+
+# Display the left grayscale image
+axs[0, 1].imshow(image_L_gray, cmap='gray')
+axs[0, 1].set_title('image_L_gray')
+
+# Display the right color image
+axs[1, 0].imshow(image_R)
+axs[1, 0].set_title('image_R')
+
+# Display the right grayscale image
+axs[1, 1].imshow(image_R_gray, cmap='gray')
+axs[1, 1].set_title('image_R_gray')
+
+# Show the plot
+plt.show()
+
+
+# Perform template matching
+result_L = cv2.matchTemplate(image, image_L_gray, cv2.TM_CCOEFF_NORMED)
+result_R = cv2.matchTemplate(image, image_R_gray, cv2.TM_CCOEFF_NORMED)
+
+# Get the location of the best match
+min_val_L, max_val_L, min_loc_L, max_loc_L = cv2.minMaxLoc(result_L)
+min_val_R, max_val_R, min_loc_R, max_loc_R = cv2.minMaxLoc(result_R)
+
+# Draw rectangles around the matched regions
+top_left_L = max_loc_L
+bottom_right_L = (top_left_L[0] + image_L_gray.shape[1], top_left_L[1] + image_L_gray.shape[0])
+cv2.rectangle(image, top_left_L, bottom_right_L, (0, 255, 0), 2)
+
+top_left_R = max_loc_R
+bottom_right_R = (top_left_R[0] + image_R_gray.shape[1], top_left_R[1] + image_R_gray.shape[0])
+cv2.rectangle(image, top_left_R, bottom_right_R, (0, 255, 0), 2)
+
+# Display the result
+plt.imshow(image)
+plt.show()
+
+
